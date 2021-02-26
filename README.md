@@ -1,1 +1,1 @@
-# Uhh how does ducat's modfinder get descriptions
+# Uhh how does ducdat's modfinder get descriptions
