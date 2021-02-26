@@ -1433,6 +1433,14 @@
       
       throw Error("Bad arguments to add: " + this + ", " + value);
     };
+    
+	Decimal.prototype.addEq = function (value) {
+      let x = this.add(D(value));
+	  this.sign=x.sign
+	  this.layer=x.layer
+	  this.mag=x.mag
+	  return this
+    };
 
     Decimal.prototype.plus = function (value) {
       return this.add(value);
@@ -1440,6 +1448,14 @@
 
     Decimal.prototype.sub = function (value) {
       return this.add(D(value).neg());
+    };
+	
+    Decimal.prototype.subEq = function (value) {
+      let x = this.add(D(value).neg());
+	  this.sign=x.sign
+	  this.layer=x.layer
+	  this.mag=x.mag
+	  return this
     };
 
     Decimal.prototype.subtract = function (value) {
