@@ -36,7 +36,7 @@ addLayer("tree-tab", {
 			content:[['raw-html', 'This mod does not work<br>This was abandoned due to me not being bothered to finish the number library<br>You can still dive through the code<br><br>[./TMTplusi]']]
 		},
 		"TPPTT":{
-			content:[['raw-html', 'This mod is bad<br>This was a mod trying to combine the perfect tower 2 and TMT<br>has 2 about features<br>Endgame: no idea<br><br><a href="./TPPTT/index.html">Play here</a>']]
+			content:[['raw-html', 'This mod is bad<br>This was a mod trying to combine the perfect tower 2 and TMT<br>has about 2 features<br>Endgame: no idea<br><br><a href="./TPPTT/index.html">Play here</a>']]
 		}
 	},
     gainMult() { // Calculate the multiplier for main currency from bonuses
