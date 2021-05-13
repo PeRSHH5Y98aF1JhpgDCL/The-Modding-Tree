@@ -1,11 +1,11 @@
 let modInfo = {
-	name: "The Knockoff Tree[the other one]",
-	id: "someTreeIGuess",
-	author: "{{author}}",
+	name: "The Tree Tree",
+	id: "meta",
+	author: "nobody",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
@@ -17,7 +17,7 @@ let VERSION = {
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.1</h3><br>
+	<h3>v0.0</h3><br>
 		- Added things.<br>
 		- Added stuff.`
 
@@ -25,7 +25,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ["blowUpEverything","maxAllDims"]
+var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
 
 function getStartPoints(){
     return new Decimal(modInfo.initialStartPoints)
@@ -38,14 +38,10 @@ function canGenPoints(){
 
 // Calculate points/sec!
 function getPointGen() {
+	if(!canGenPoints())
+		return new Decimal(0)
+
 	let gain = new Decimal(1)
-	gain=gain.mul(nd(1.1).pow(getBuyableAmount('p',11)))
-	if (hasUpgrade("p",11)) gain=gain.mul(upgradeEffect('p',11))
-	if (hasUpgrade("p",21)) gain=gain.mul(1.5)
-	if (hasUpgrade("p",12)) gain=gain.pow(new Decimal(2).mul(hasUpgrade('p',22)?1.33:1))
-	if (hasUpgrade("p",13)) gain=gain.pow(1.75)
-	gain=gain.mul(temp.a.effect)
-	gain=gain.mul(temp.di.effect)
 	return gain
 }
 
