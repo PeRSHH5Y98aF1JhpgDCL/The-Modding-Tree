@@ -18,7 +18,7 @@ addLayer("tree-tab", {
 			content:[['raw-html', 'Hey, here\'s my meta-thing for all my mods<br>i sure hope i can finish this before my motivation instantly gets nullified<br>Points do nothing<br>i used tmt because:can\'t be bothered with html']]
 		},
 		"Prestige Tree Extreme":{
-			content:[['raw-html', 'This mod is like, okay?<br>Every normal layer\'s exponent is reduced *0.9 and static increased *(1/0.9)<br>Balanced up to 2 row 3 layers<br><br><a href="./PTextreme/index.html">Play here</a>']]
+			content:[['raw-html', 'This mod is like, okay?<br>Every normal layer\'s exponent is reduced *0.9 and static increased *(1/0.9)<br>Balanced up to 2 row 3 layers<br>Please ignore the warning(no idea how it got there)<br><br><a href="./PTextreme/index.html">Play here</a>']]
 		},
 		"The Omega Tree":{
 			content:[['raw-html', 'This mod is decent.<br>This was supposed to go to OmegaNum\'s limit(and actually uses omeganum)<br>Not actually balanced.<br><br><a href="./OmegaTree/index.html">Play here</a>']]
