@@ -1,5 +1,77 @@
 # The Modding Tree changelog:
 
+# v2.5.4 - 5/10/21
+- Added a setting to always use single-tab mode.
+- Added directMult, which multiplies prestige gain after exponents and softcaps. It actually multiplies gain for static layers.
+- Added onEnter and onExit for challenges.
+- Improved displaying numbers between 0.0001 and 0.1.
+- Added documentation on how gainMult/Exp work for static layers.
+- Fixed a visual issue on mobile, thanks to thepaperpilot.
+- Improved documentation in general.
+
+# v2.5.3 - 5/8/21
+- Improved performance of tab formats and bars.
+- Respec confirmation settings are now kept on resets.
+- Improved compatibility with older browsers.
+- Fixed missing pixel on vertical bars.
+
+# v2.5.2.1 - 5/7/21
+- Fixed microtabs making layers highlight incorrectly.
+
+# v2.5.2 - 5/7/21
+- Added glowColor for subtabs.
+- Improved the display for extremely small numbers.
+- Fixed issues in the buyable docs.
+
+# v2.5.1 - 5/7/21
+- Fixed dynamic things in tabFormat not updating.
+
+## v2.5: Dreams Really Do Come True - 5/7/21
+- Optimizations, hopefully a significant amount.
+- Added OOM/s point gen display at high values (thanks to Ducdat!)
+- Only one tab will display if the window is not wide enough (also thanks to Ducdat!)
+- Holding down a buyable's button now buys it continuously.
+- New milestone setting will also show the most recently unlocked milestone. (Also renamed all settings to be clearer)
+- Added an onHold feature for clickables.
+- Layer nodes will be highlighted even if the player is on the same tab.
+- Added customizable node glowColor.
+- Added buyable purchaseLimit.
+- Amount is automatically supplied to buyable cost and effect functions.
+- Locked (not yet visible) milestones no longer take up space. Also fixed hidden milestones taking a tiny bit of space.
+- Re-centered respec buttons.
+- Force-displayed tooltips are not hidden by resets.
+- Added formatting support for very small numbers. Disabled in most places by default because rounding errors might cause issues. Access it with formatSmall, or enable it globally by adding "allowSmall: true" to modInfo.
+
+
+# v2.4.1 - 4/29/21
+- A number of minor fixes, many thanks to thepaperpilot.
+- The respec confirmation checkbox is now part of the respec-button component.
+    (This also fixes the checkbox appearing when there is no respec button)
+- Added a few undocumented changes to the 2.4 changelog (the two at the bottom)
+
+## v2.4: Rationalized Edition - 4/29/21
+- Completely reworked tooltips. Shift-click a node to force its tooltip to stay displayed. (And hopefully finally fixed flickering!)
+- Added text-input and slider components.
+- Added the ability to toggle respec confirmations.
+- Added custom respec confirmation messages.
+- The red layer highlight will not appear before a layer is unlocked.
+- Added unlocking hotkeys.
+- You no longer need to supply 'rows' and 'cols' for any Big Features.
+- Node symbols can use HTML.
+- Added documentation for the respec button.
+- Added prestigeNotify to subtabs, and prestigeNotify in subtabs also highlights the layer node.
+- The version number no longer contains special characters or irrational numbers.
+
+- Added ctrlDown and shiftDown variables.
+- Tooltips now use HTML (this means you need to replace any newlines with <br>)
+
+
+# v2.π.1 - 4/7/21
+- Fixed formatting for some larger numbers.
+- Upgrades will expand if there is too much text to display. 
+- Fixed styling challenges.
+- No longer attempts to display a base currency when there is none.
+
 ## v2.π: Incrementally Updated - 2/5/21
 - Performance improvements.
 - Fixed tooltips overlapping with the top display.
@@ -8,6 +80,7 @@
 - "Best" is updated automatically.
 - Fixed keeping Decimal values on reset.
 - Code reorganization and style improvements by fudo.
+
 
 ## v2.3.5 - 12/21/20
 - Added resetTime, which tracks the time since a layer prestiged or was reset.
