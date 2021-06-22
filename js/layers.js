@@ -5,13 +5,14 @@ addLayer("tree-tab", {
     startData() { return {
         unlocked: true,
 		points: new Decimal(0),
+		total: new Decimal(0)
     }},
     color: "#FFFFFF",
     requires: new Decimal(10), // Can be a function that takes requirement increases into account
     resource: "prestige points", // Name of prestige currency
     baseResource: "points", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
-    type: "none", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
 	tabFormat:{
 		Main:{
@@ -37,10 +38,25 @@ addLayer("tree-tab", {
 		},
 		"TPPTT":{
 			content:[['raw-html', 'This mod is bad<br>This was a mod trying to combine the perfect tower 2 and TMT<br>has about 2 features<br>Endgame: no idea<br><br><a href="./TPPTT/index.html">Play here</a>']]
+		},
+		"Damage tree":{
+			content:[['raw-html', 'This mod is unfinished<br>This was a mod that starts with damaging enemies... and that\'s about it<br>has about 4 features<br>Endgame: 5 planets<br><br><a href="./DamageTree/index.html">Play here</a>']]
+		},
+		"Prestige points":{
+			content:['main-display', 'prestige-button', 'upgrades'],
+			unlocked:()=>{return player["tree-tab"].total.gt(0)}
+		}
+	},
+	upgrades: {
+		11: {
+			title: "name points 'udiiwyth' for something?",
+			description: "does anyone check the demo?",
+			cost: new Decimal(10000),
+			
 		}
 	},
     gainMult() { // Calculate the multiplier for main currency from bonuses
-        mult = new Decimal(0)
+        mult = new Decimal(1)
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -48,7 +64,7 @@ addLayer("tree-tab", {
     },
     row: 0, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
-        {key: "sdfdsf", description: "There's no secrets here", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "p", description: "P: Reset for prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return true}
 })
