@@ -267,7 +267,7 @@ addLayer("d", {
 			description() {return "Unlock another layer";},
 			cost: new Decimal("1e22"),
 			unlocked() {return hasUpgrade("d", 45)},
-			onBuy() {player.p.unlocked=true}
+			onPurchase() {player.p.unlocked=true}
 		},
 	},
 	buyables: {
