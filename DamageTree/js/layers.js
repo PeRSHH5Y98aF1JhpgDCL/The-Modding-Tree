@@ -4,6 +4,12 @@ let loar = {
 		["All I've done so far is just adding upgrades and buyables.", "You could add a lot of branching paths but that'd be a nightmare to implement.", "No wonder all mods just seem like the same.", "...what do i do now?"],
 		["I don't really want to make anything because that'd be too much work.", "...", "Just take your /8 scaling and leave.", "scaling reduction"],
 		["Hidden upgrade", "enemy scaling", "damage shards", "scaling reduction"]
+	],
+	p:[
+		["...i know that this game is just a dim reflection of a better game which I'm not talented or creative enough to create","..but I'm just creating this for me and not anyone else, right?", "i don't know what i want this to be...", "whatever."],
+		["???","???","???","???"],
+		["???", "Why are you here?", "???", "???"],
+		["More complex", "complexity cap", "planets", "complexity cap"]
 	]
 }
 addLayer("d", {
@@ -32,6 +38,7 @@ addLayer("d", {
     gainMult() { // Calculate the multiplier for main currency from bonuses
         mult = new Decimal(1)
 		mult = mult.mul(temp.p.effect)
+		mult=mult.mul(player.p.c22points.add(1).log10().add(1).pow(5))
         return mult
     },
 	getDamage() {
@@ -40,10 +47,13 @@ addLayer("d", {
 		if (hasUpgrade('d', 44)) x=x.mul(player.points.add(1).log10().add(1))
 		x=x.mul(buyableEffect('d',11))
 		x=x.mul(temp.p.effect)
+		x=x.pow(player.p.c12points.add(1).log10().add(1).sqrt())
+		if (inChallenge('p',13)) x=x.add(1).log10().add(1)
 		return x 
 	},
 	getScalingReduction() {
 		let x=new Decimal(1)
+		if (inChallenge('p',22)) return x
 		if (hasUpgrade('d',11)) x=x.mul(2)
 		if (hasUpgrade('d',12)) x=x.mul(2)
 		if (hasUpgrade('d',23)) x=x.mul(temp.d.getEffectiveResetTime.add(1).sqrt())
@@ -53,20 +63,23 @@ addLayer("d", {
 		x=x.mul(buyableEffect('d',13))
 		x=x.mul(buyableEffect('d',14))
 		x=x.mul(temp.p.effect)
+		x=x.mul(player.p.c11points.add(1).pow(0.1))
+		if (inChallenge('p',21)) x=x.root(10)
 		return x
 	},
 	getMaxHp() {
 		let effPoints=player.points
 		if (hasUpgrade('d',15)) effPoints=effPoints.pow(0.8)
 		let x = Decimal.pow(1.1,effPoints.div(tmp.d.getScalingReduction))
+		if (inChallenge('p',21)) x=Decimal.pow(2,x.div(tmp.d.getScalingReduction.add(1).log10().add(1)))
 		if (hasUpgrade('d',13)) x=x.sub(1)
-		if (hasUpgrade('d',52)) x=x.div(temp.d.getDamage.pow(player.d.timeSinceKill))
+		
 		return x
 	},
 	update(dt) {
 		player.d.damage=player.d.damage.add(temp.d.getDamage.mul(dt))
 		player.d.timeSinceKill+=dt
-		if (player.d.damage.gt(tmp.d.getMaxHp)) {
+		if (temp.d.getHealth.lt(0)) {
 			if (!hasUpgrade('p',12)) {
 				player.d.damage=new Decimal(0)
 				player.d.timeSinceKill=0
@@ -82,19 +95,31 @@ addLayer("d", {
 				if (hasUpgrade('d',53)) overkillAmt=overkillAmt.add(metakill)
 				if (hasUpgrade('d',52)) overkillAmt=overkillAmt.pow(0.9).floor()
 				overkillAmt=overkillAmt.mul(temp.p.effect)
+				if (inChallenge('p',11)) overkillAmt=overkillAmt.root(4)
+				if (inChallenge('p',21)) overkillAmt=overkillAmt.root(2)
+				if (inChallenge('p',22)) overkillAmt=overkillAmt.root(20)
 				player.points=player.points.add(overkillAmt.floor())
 			}
 		}
 	},
+	getHealth() {
+		let effMHp=tmp.d.getMaxHp
+		let y=new Decimal(player.d.timeSinceKill)
+		if (hasUpgrade('p',22)) y=y.mul(tmp.p.effect)
+		if (hasUpgrade('d',52)) effMHp=effMHp.div(temp.d.getDamage.pow(y))
+		let x=effMHp.sub(player.d.damage)
+		return x
+	},
     gainExp() { // Calculate the exponent on main currency from bonuses
         let exp=new Decimal(1)
 		if (hasUpgrade('d', 22)) exp=exp.mul(1.5)
+			if (inChallenge('p',12)) exp=exp.mul(0.1)
 		return exp
     },
 	tabFormat: {
 		Main: {
 			content: [
-				"main-display", "prestige-button", "blank", "resource-display",["display-text",()=>`Health: ${format(tmp.d.getMaxHp.sub(player.d.damage))}/${format(tmp.d.getMaxHp)}<br>(-${format(player.d.damage)} from max)<br>(-${format(temp.d.getDamage)}/s)`],"upgrades"
+				"main-display", "prestige-button", "blank", "resource-display",["display-text",()=>`Health: ${format(temp.d.getHealth)}/${format(tmp.d.getMaxHp)}<br>(-${format(player.d.damage)} from max)<br>(-${format(temp.d.getDamage)}/s)`],"upgrades"
 			]
 		},
 		Buyables: {
@@ -218,7 +243,7 @@ addLayer("d", {
 		},
 		52:{
 			title:"Best damage",
-			description: "Damage now divides max health and subtracts, but overkill is raised to ^0.9",
+			description: "Damage now divides and subtracts health, but overkill is raised to ^0.9",
 			cost: new Decimal("1e9"),
 			unlocked() {return hasUpgrade("d", 51)}
 		},
@@ -354,7 +379,12 @@ addLayer("p", {
     startData() { return {
         unlocked: false,
 		points: new Decimal(0),
-		complexity:new Decimal(0)
+		complexity:new Decimal(0),
+		c11points: new Decimal(0),
+		c12points: new Decimal(0),
+		c13points: new Decimal(0),
+		c21points: new Decimal(0),
+		c22points: new Decimal(0)
     }},
     color: "#888800",
     requires: new Decimal(1e20), // Can be a function that takes requirement increases into account
@@ -384,6 +414,9 @@ addLayer("p", {
 	getCompLim() {
 		let x=new Decimal(50)
 		x=x.mul(temp.p.effect)
+		x=x.mul(buyableEffect('p',11))
+		if (hasUpgrade('p',23)) x=x.mul(player.p.complexity.add(1).log10().add(1))
+		x=x.mul(player.p.c13points.add(1))
 		return x
 	},
 	update(dt) {
@@ -403,11 +436,141 @@ addLayer("p", {
 			description: "Advancing a zone no longer resets damage and \"Best damage\"<br><i>Same as the other upgrade...</i>",
 			cost:4,
 			unlocked() {return hasUpgrade('p',11)}
+		},
+		13:{
+			title:"todo",
+			description: "Placeholder",
+			cost: new Decimal(NaN),
+			pay () {},
+			canAfford() {},
+			unlocked() {return hasUpgrade("p", 12)}
+		},
+		21:{
+			title: "Dwarf planets",
+			description: "You can get half a planet and planets can be maxed<br><i>...</i>",
+			cost:5,
+			unlocked() {return hasUpgrade('p',13)}
+		},
+		22:{
+			title: "Somehow better damage",
+			description: "\"Best damage\" is affected by planet effect",
+			cost:5.7,
+			unlocked() {return hasUpgrade('p',21)}
+		},
+		23:{
+			title: "sqrt(-log(x))",
+			description: "Complexity limit is multiplied by log(complexity)",
+			cost:6.7,
+			unlocked() {return hasUpgrade('p',22)}
+		},
+		31:{
+			title: "Challenging",
+			description: "Unlock challenges",
+			cost:7.1,
+			unlocked() {return hasUpgrade('p',23)}
+		},
+	},
+	canBuyMax() {
+		return hasUpgrade('p',21)
+	},
+	canBeFractional() {
+		return hasUpgrade('p',21)
+	},
+	challenges: {
+		11: {
+			name: "Alternate bottleneck",
+			challengeDescription: "Overkill is fourth rooted. Your highest zones in this challenge divides scaling.",
+			rewardDescription() {
+				return "Your "+format(player.p.c11points)+" zones traveled in this challenge reduce scaling by "+ format(player.p.c11points.add(1).pow(0.1))
+			},
+			canComplete() {return false},
+			goalDescription: "Infinity zones",
+			onExit() {
+				player.p.c11points=player.points
+			}
+		},
+		12: {
+			name: "No upgrades",
+			challengeDescription: "Damage shards are raised ^0.1. Your highest zones in this challenge raises damage to an exponent.",
+			rewardDescription() {
+				return "Your "+format(player.p.c12points)+" zones traveled in this challenge raises damage by "+ format(player.p.c12points.add(1).log10().add(1).sqrt())
+			},
+			canComplete() {return false},
+			goalDescription: "Infinity zones",
+			onExit() {
+				player.p.c12points=player.points
+			}
+		},
+		13: {
+			name: "No damage",
+			challengeDescription: "Damage is log10(). Your highest damage in this challenge multiplies complexity cap.",
+			rewardDescription() {
+				return "Your "+format(player.p.c13points)+" dps in this challenge multiples complexity by "+ format(player.p.c13points.add(1))
+			},
+			canComplete() {return false},
+			goalDescription: "Infinity zones",
+			onExit() {
+				player.p.c13points=temp.d.getDamage
+			}
+		},
+		21: {
+			name: "Very scaled",
+			challengeDescription: "Enemy scaling is significantly faster.<br>Overkill is square rooted. <br>Scaling reduction is ^0.1<br>Your highest zones in this challenge multiplies planet base.",
+			rewardDescription() {
+				return "Your "+format(player.p.c21points)+" zones in this challenge multiples planet base by "+ format(player.p.c21points.add(1).log10().add(1).log10().add(1))
+			},
+			//countsAs: [11],
+			canComplete() {return false},
+			goalDescription: "Infinity zones",
+			onExit() {
+				player.p.c21points=player.points
+			}
+		},
+		22: {
+			name: "No.",
+			challengeDescription: "Damage scaling is forced to 1.<br>Overkill is ^1/20<br>Your highest zones in this challenge multiplies damage shard gain",
+			rewardDescription() {
+				return "Your "+format(player.p.c22points)+" zones in this challenge multiples damage shard gain by "+ format(player.p.c22points.add(1).log10().add(1).pow(5))
+			},
+			canComplete() {return false},
+			goalDescription: "Infinity zones",
+			onExit() {
+				player.p.c22points=player.points
+			}
+		},
+		23: {
+			name: "<i>Why?</i>",
+			challengeDescription: "All previous challenges except 13 are applied at once.",
+			rewardDescription() {
+				return "Unlock the next layer..."
+			},
+			countsAs: [11,12,21,22],
+			canComplete() {return player.points.gte(100)},
+			goalDescription: "100 zones",
+			completionLimit:1
 		}
 	},
+	buyables: {11: {
+			title(x) {return loar.p[getBuyableAmount(this.layer,this.id).min(loar.p.length-1)][0]},
+			cost(x) { return new Decimal(x.add(1)).pow(1.5).floor()},
+			display() { return "<b>Multiply "+loar.p[getBuyableAmount(this.layer,this.id).min(loar.p.length-1)][1]+" by 10</b><br><b>Cost</b>: "+format(temp[this.layer].buyables[this.id].cost)+' '+loar.p[getBuyableAmount(this.layer,this.id).min(loar.p.length-1)][2]+"<br><b>Effect</b>:"+format(temp[this.layer].buyables[this.id].effect)+' '+loar.p[getBuyableAmount(this.layer,this.id).min(loar.p.length-1)][3]},
+			canAfford() { return player[this.layer].points.gte(this.cost()) },
+			buy() {
+				player[this.layer].points = player[this.layer].points.sub(this.cost())
+				setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+			},
+			effect() {
+				return new Decimal(10).pow(getBuyableAmount(this.layer,this.id))
+			},
+			unlocked() {
+				return hasUpgrade('p',13)
+			},
+			purchaseLimit: Infinity
+		},},
 	getPlanetBase() {
 		let x=new Decimal(2)
 		x=x.mul(player.p.complexity.add(1).log10().add(1).sqrt())
+		x=x.mul(player.p.c21points.add(1).log10().add(1).log10().add(1))
 		return x
 	},
 	tabFormat: {
@@ -417,10 +580,16 @@ addLayer("p", {
 			]
 		},
 		Life: {
-			content: [["display-text", ()=>{return "You have "+format(player.p.complexity)+' complexity('+format(temp.p.getCompLim.sub(player.p.complexity).mul(player.p.points.div(1000)))+'/s, based on planets and cap)<br>Complexity is capped at '+format(temp.p.getCompLim)+"(based on planet effect)<br>Your complexity is multiplying planet base by "+format(player.p.complexity.add(1).log10().add(1).sqrt())}]],
+			content: [["display-text", ()=>{return "You have "+format(player.p.complexity)+' complexity('+format(temp.p.getCompLim.sub(player.p.complexity).mul(player.p.points.div(1000)))+'/s, based on planets and cap)<br>Complexity is capped at '+format(temp.p.getCompLim)+"(based on planet effect)<br>Your complexity is multiplying planet base by "+format(player.p.complexity.add(1).log10().add(1).sqrt())}],"buyables"],
 			unlocked() {
 				return hasUpgrade('p',11)
 			}
+		},
+		Challenges: {
+			content: ["challenges"],
+			unlocked() {
+				return hasUpgrade('p',31)
+			},
 		}
 	},
     layerShown(){return player.p.unlocked},

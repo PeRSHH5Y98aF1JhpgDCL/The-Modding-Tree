@@ -18,10 +18,15 @@ function getResetGain(layer, useType = null) {
 		return new Decimal (0)
 	if (tmp[layer].gainExp.eq(0)) return decimalZero
 	if (type=="static") {
-		if ((!tmp[layer].canBuyMax) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalOne
-		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult).max(1).log(tmp[layer].base).times(tmp[layer].gainExp).pow(Decimal.pow(tmp[layer].exponent, -1))
+		if ((!tmp[layer].canBuyMax) || (tmp[layer].baseAmount.lt(tmp[layer].requires)&&!tmp[layer].canBeFractional)) return decimalOne
+		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult)
+		if (!tmp[layer].canBeFractional) gain=gain.max(1)
+		gain=gain.log(tmp[layer].base).times(tmp[layer].gainExp).pow(Decimal.pow(tmp[layer].exponent, -1))
 		gain = gain.times(tmp[layer].directMult)
-		return gain.floor().sub(player[layer].points).add(1).max(1);
+		if (!tmp[layer].canBeFractional) gain=gain.floor()
+		gain=gain.sub(player[layer].points).add(1);
+		if (!tmp[layer].canBeFractional) gain=gain.max(1)
+		return gain
 	} else if (type=="normal"){
 		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalZero
 		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).pow(tmp[layer].exponent).times(tmp[layer].gainMult).pow(tmp[layer].gainExp)
@@ -51,6 +56,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 
 	if (type=="static") 
 	{
+		//if (tmp[layer].canBeFractional) return tmp[layer].baseAmount.mul(0.999999).max(tmp[layer].requires)
 		if (!tmp[layer].canBuyMax) canMax = false
 		let amt = player[layer].points.plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0).div(tmp[layer].directMult)
 		let extraCost = Decimal.pow(tmp[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
@@ -120,7 +126,7 @@ function canReset(layer)
 	else if(tmp[layer].type == "normal")
 		return tmp[layer].baseAmount.gte(tmp[layer].requires)
 	else if(tmp[layer].type== "static")
-		return tmp[layer].baseAmount.gte(tmp[layer].nextAt) 
+		return tmp[layer].baseAmount.gte(tmp[layer].nextAt) || (tmp[layer].canBeFractional&&tmp[layer].resetGain.gte(0)&&tmp[layer].baseAmount.gt(tmp[layer].requires))
 	else 
 		return false
 }
@@ -181,7 +187,7 @@ function doReset(layer, force=false) {
 		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return;
 		let gain = tmp[layer].resetGain
 		if (tmp[layer].type=="static") {
-			if (tmp[layer].baseAmount.lt(tmp[layer].nextAt)) return;
+			if (tmp[layer].baseAmount.lt(tmp[layer].nextAt)&&!tmp[layer].canBeFractional) return;
 			gain =(tmp[layer].canBuyMax ? gain : 1)
 		} 
 
