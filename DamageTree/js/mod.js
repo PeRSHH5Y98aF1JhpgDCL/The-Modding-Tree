@@ -4,7 +4,7 @@ let modInfo = {
 	author: "████████#4064",
 	pointsName: "zone",
 	modFiles: ["layers.js", "tree.js"],
-	endGame: "<i>Why?</i> completed",
+	endGame: "60 zones in <i>Why?</i>",
 	discordName: "",
 	discordLink: "",
 	initialStartPoints: new Decimal (0), // Used for hard resets and new players
@@ -59,7 +59,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return challengeCompletions('p',23)
+	return inChallenge('p',23)&&player.points.gte(60)
 }
 
 
