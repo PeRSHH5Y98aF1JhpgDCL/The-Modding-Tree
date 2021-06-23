@@ -188,6 +188,7 @@ function setupLayer(layer){
     if(layers[layer].name === undefined) layers[layer].name = layer
     if(layers[layer].layerShown === undefined) layers[layer].layerShown = true
     if(layers[layer].glowColor === undefined) layers[layer].glowColor = "#ff0000"
+	if(layers[layer].canBeFractional === undefined) layers[layer].canBeFractional = false
 
     let row = layers[layer].row
 
